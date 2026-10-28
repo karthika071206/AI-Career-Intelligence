@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Analyzer | CareerCast{% endblock %}
+
+{% block body %}
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <a class="brand side-brand" href="{{ url_for('dashboard') }}">
+            Career<span>Cast</span>
+        </a>
+
+        <div class="side-caption">CAREER INTELLIGENCE</div>
+
+        <nav class="side-nav">
+
+            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                <span>⌂</span> Overview
+            </a>
+
+            <a class="nav-link" href="{{ url_for('profile') }}">
+                <span>◉</span> My profile
+            </a>
+
+            <a class="nav-link active" href="{{ url_for('resume_analyzer') }}">
+                <span>▤</span> Resume analyzer
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <form action="{{ url_for('logout') }}" method="POST">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <button class="nav-link logout-link" type="submit">
+                    <span>↪</span> Sign out
+                </button>
+
+            </form>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN WORKSPACE -->
+    <main class="workspace">
+
+        <header class="workspace-header">
+
+            <div>
+                <div class="eyebrow">RESUME INTELLIGENCE</div>
+
+                <h1>Resume Analyzer</h1>
+
+                <p>
+                    Extract technical skills, soft skills, education,
+                    and career information from your resume.
+                </p>
+            </div>
+
+            <a class="btn btn-outline" href="{{ url_for('dashboard') }}">
+                ← Dashboard
+            </a>
+
+        </header>
+
+
+        <section class="content-panel resume-panel">
+
+            <!-- UPLOAD SECTION -->
+            <div class="panel-heading">
+
+                <div class="panel-icon">▤</div>
+
+                <div>
+                    <h2>Upload your resume</h2>
+
+                    <p>
+                        Upload your PDF or DOCX resume to identify
+                        career-related information.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- UPLOAD FORM -->
+            <form
+                method="POST"
+                action="{{ url_for('resume_analyzer') }}"
+                enctype="multipart/form-data"
+                class="upload-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <label class="drop-zone" for="resume">
+
+                    <span class="upload-symbol">↑</span>
+
+                    <strong>Choose a PDF or DOCX resume</strong>
+
+                    <span class="drop-hint">
+                        Select a file from your computer
+                    </span>
+
+                    <span class="file-name" id="file-name">
+                        No file selected
+                    </span>
+
+                    <input
+                        type="file"
+                        id="resume"
+                        name="resume"
+                        accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        required
+                    >
+
+                </label>
+
+                <div class="upload-meta">
+                    <span>PDF or DOCX</span>
+                    <span>Maximum 5 MB</span>
+                    <span>Text-based PDF recommended</span>
+                </div>
+
+                <button class="btn btn-primary" type="submit">
+                    Upload and analyze <span>→</span>
+                </button>
+
+            </form>
+
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+
+                        {% for category, message in messages %}
+                            <div
+                                class="alert alert-{{ category }}"
+                                role="alert"
+                            >
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+
+            <!-- ANALYSIS RESULTS -->
+            {% if result %}
+
+            <section class="analysis-results">
+
+                <div class="results-header">
+
+                    <div>
+                        <div class="eyebrow">ANALYSIS COMPLETE</div>
+                        <h2>Resume Results</h2>
+                    </div>
+
+                    <span class="result-badge">Parsed</span>
+
+                </div>
+
+
+                <!-- SUMMARY CARDS -->
+                <div class="result-stats">
+
+                    <div>
+                        <small>FILE</small>
+                        <strong>{{ result.filename }}</strong>
+                    </div>
+
+                    <div>
+                        <small>EXTRACTED TEXT</small>
+                        <strong>{{ result.text_length }} characters</strong>
+                    </div>
+
+                    <div>
+                        <small>TOTAL SKILLS</small>
+                        <strong>
+                            {{ result.skills|default([], true)|length }}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <!-- TECHNICAL SKILLS -->
+                <section class="resume-result-section">
+
+                    <h3>Technical Skills</h3>
+
+                    {% set technical_skills =
+                        result.technical_skills|default([], true) %}
+
+                    {% if technical_skills %}
+
+                        <div class="skill-chips">
+                            {% for skill in technical_skills %}
+                                <span>{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+
+                    {% else %}
+
+                        <p class="muted">
+                            No technical skills were detected.
+                            Check the extracted text and skill patterns.
+                        </p>
+
+                    {% endif %}
+
+                </section>
+
+
+                <!-- SOFT SKILLS -->
+                <section class="resume-result-section">
+
+                    <h3>Soft Skills</h3>
+
+                    {% set soft_skills =
+                        result.soft_skills|default([], true) %}
+
+                    {% if soft_skills %}
+
+                        <div class="skill-chips">
+                            {% for skill in soft_skills %}
+                                <span>{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+
+                    {% else %}
+
+                        <p class="muted">
+                            No soft skills were detected.
+                        </p>
+
+                    {% endif %}
+
+                </section>
+
+
+                <!-- CERTIFICATIONS -->
+                <section class="resume-result-section">
+
+                    <h3>Certifications</h3>
+
+                    {% set certifications =
+                        result.certifications|default([], true) %}
+
+                    {% if certifications %}
+
+                        <div class="skill-chips">
+                            {% for certification in certifications %}
+                                <span>{{ certification }}</span>
+                            {% endfor %}
+                        </div>
+
+                    {% else %}
+
+                        <p class="muted">
+                            No recognized certifications were detected.
+                            Make sure certification names are included in
+                            the resume text and supported by the extraction rules.
+                        </p>
+
+                    {% endif %}
+
+                </section>
+
+
+                <!-- EDUCATION -->
+                <section class="resume-result-section">
+
+                    <h3>Education</h3>
+
+                    {% set education =
+                        result.education|default([], true) %}
+
+                    {% if education %}
+
+                        <div class="skill-chips">
+                            {% for item in education %}
+                                <span>{{ item }}</span>
+                            {% endfor %}
+                        </div>
+
+                    {% else %}
+
+                        <p class="muted">
+                            No recognized education terms were found.
+                        </p>
+
+                    {% endif %}
+
+                </section>
+
+
+                <!-- JOB TITLES -->
+                <section class="resume-result-section">
+
+                    <h3>Job Titles</h3>
+
+                    {% set job_titles =
+                        result.job_titles|default([], true) %}
+
+                    {% if job_titles %}
+
+                        <div class="skill-chips">
+                            {% for title in job_titles %}
+                                <span>{{ title }}</span>
+                            {% endfor %}
+                        </div>
+
+                    {% else %}
+
+                        <p class="muted">
+                            No recognized job titles were found.
+                        </p>
+
+                    {% endif %}
+
+                </section>
+
+
+                <!-- NAMED ENTITIES -->
+                <section class="resume-result-section">
+
+                    <h3>Named Entities (spaCy)</h3>
+
+                    {% set entities =
+                        result.entities|default([], true) %}
+
+                    {% if entities %}
+
+                        <div class="skill-chips">
+
+                            {% for entity in entities %}
+
+                                <span>
+                                    {{ entity.text }} — {{ entity.label }}
+                                </span>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <p class="muted">
+                            No named entities were recognized.
+                            This may happen when the NLP model cannot
+                            identify relevant entities in the resume.
+                        </p>
+
+                    {% endif %}
+
+                </section>
+
+
+                <!-- EXTRACTED TEXT -->
+                <details class="extracted-text">
+
+                    <summary>View Extracted Resume Text</summary>
+
+                    <pre>{{ result.text }}</pre>
+
+                </details>
+
+            </section>
+
+            {% endif %}
+
+
+            <!-- PRIVACY NOTICE -->
+            <div class="privacy-callout">
+
+                <span>ⓘ</span>
+
+                <p>
+                    <b>Prototype information:</b>
+                    CareerCast extracts text from PDF and DOCX files.
+                    Technical and soft skills are identified using
+                    predefined patterns. Education and job-title
+                    detection also use configured rules. spaCy performs
+                    named entity recognition, but may not identify every
+                    relevant item. Scanned PDFs may require OCR.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- SELECTED FILE NAME -->
+<script>
+
+    const resumeInput = document.getElementById("resume");
+    const fileName = document.getElementById("file-name");
+
+    if (resumeInput && fileName) {
+
+        resumeInput.addEventListener("change", function () {
+
+            fileName.textContent = this.files.length
+                ? this.files[0].name
+                : "No file selected";
+
+        });
+
+    }
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,347 @@
+
+{% extends "base.html" %}
+
+{% block title %}Career Recommendations | CareerCast{% endblock %}
+
+{% block body %}
+
+<div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <a class="brand side-brand" href="{{ url_for('dashboard') }}">
+            Career<span>Cast</span>
+        </a>
+
+        <div class="side-caption">CAREER INTELLIGENCE</div>
+
+        <nav class="side-nav">
+
+            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                ⌂ Overview
+            </a>
+
+            <a class="nav-link" href="{{ url_for('profile') }}">
+                ◉ My profile
+            </a>
+
+            <a class="nav-link" href="{{ url_for('resume_analyzer') }}">
+                ▤ Resume analyzer
+            </a>
+
+            <a class="nav-link active"
+               href="{{ url_for('career_recommendations') }}">
+                ↗ Career recommendations
+            </a>
+
+            <a class="nav-link" href="{{ url_for('skill_gap') }}">
+                ⌁ Skill gap analysis
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <form action="{{ url_for('logout') }}" method="POST">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <button class="nav-link logout-link" type="submit">
+                    ↪ Sign out
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+    <!-- Main workspace -->
+    <main class="workspace">
+
+        <!-- Page header -->
+        <header class="workspace-header">
+
+            <div>
+
+                <div class="eyebrow">
+                    CAREER MATCHING ENGINE
+                </div>
+
+                <h1>Career Recommendations</h1>
+
+                <p>
+                    Explore career paths based on your skills,
+                    education, and professional interests.
+                </p>
+
+            </div>
+
+            <a class="btn btn-outline"
+               href="{{ url_for('export_recommendations') }}">
+                Export CSV ↓
+            </a>
+
+        </header>
+
+        <!-- Error message -->
+        {% if error_message %}
+
+            <div class="alert alert-warning" role="alert">
+                {{ error_message }}
+            </div>
+
+        {% endif %}
+
+        <!-- Recommendations panel -->
+        <section class="content-panel">
+
+            <!-- Profile summary -->
+            <div class="panel-heading">
+
+                <div class="panel-icon">↗</div>
+
+                <div>
+
+                    <h2>Your Matching Profile</h2>
+
+                    <p>
+                        Profile interests:
+                        {{ interest or 'Not specified yet' }}
+
+                        {% if resume_filename %}
+                            · Resume analyzed: {{ resume_filename }}
+                        {% endif %}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- User skills -->
+            {% if skills %}
+
+                <div class="skill-chips">
+
+                    {% for skill in skills %}
+
+                        <span>{{ skill }}</span>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>Add your skills to get useful matches</h3>
+
+                    <p>
+                        Complete your profile or upload a resume
+                        before generating recommendations.
+                    </p>
+
+                    <a class="btn btn-primary"
+                       href="{{ url_for('profile') }}">
+                        Complete Profile →
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+            <!-- Career recommendation cards -->
+            <div class="recommendation-list">
+
+                {% for rec in recommendations %}
+
+                    <article class="recommendation-card">
+
+                        <!-- Career title and suitability score -->
+                        <div class="recommendation-head">
+
+                            <div>
+
+                                <span class="rank-label">
+                                    MATCH #{{ loop.index }}
+                                </span>
+
+                                <h3>{{ rec.career }}</h3>
+
+                            </div>
+
+                            <div class="score-pill">
+
+                                {{ "%.2f"|format(rec.score) }}
+
+                                <small>% suitability score</small>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Suitability score indicator -->
+                        <div
+                            class="progress"
+                            role="progressbar"
+                            aria-label="{{ rec.career }} suitability score"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            aria-valuenow="{{ [rec.score, 100]|min }}"
+                        >
+
+                            <span
+                                style="width: {{ [[rec.score, 0]|max, 100]|min }}%">
+                            </span>
+
+                        </div>
+
+                        <!-- Matched skills summary -->
+                        <p>
+                            {{ rec.matched|length }}
+                            of {{ rec.required_count }}
+                            target skills currently matched.
+                        </p>
+
+                        <div class="split-columns">
+
+                            <!-- Skills the user has -->
+                            <div>
+
+                                <h4>Skills You Have</h4>
+
+                                {% if rec.matched %}
+
+                                    <div class="skill-chips">
+
+                                        {% for skill in rec.matched %}
+
+                                            <span class="chip-success">
+                                                {{ skill }}
+                                            </span>
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% else %}
+
+                                    <p class="muted">
+                                        No matched skills identified yet.
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+                            <!-- Skills to develop -->
+                            <div>
+
+                                <h4>Skills to Develop</h4>
+
+                                {% if rec.missing %}
+
+                                    <div class="skill-chips">
+
+                                        {% for skill in rec.missing[:6] %}
+
+                                            <span class="chip-missing">
+                                                {{ skill }}
+                                            </span>
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% else %}
+
+                                    <p class="muted">
+                                        No additional skills identified
+                                        by the current checklist.
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <!-- Learning roadmap -->
+                        <a class="tool-link"
+                           href="{{ url_for('skill_gap', career=rec.career) }}">
+                            Open Learning Roadmap →
+                        </a>
+
+                    </article>
+
+                {% else %}
+
+                    {% if skills and not error_message %}
+
+                        <div class="empty-state">
+
+                            <h3>No career recommendations available</h3>
+
+                            <p>
+                                No recommendations were generated.
+                                Please check your profile information
+                                and try again.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                {% endfor %}
+
+            </div>
+
+            <!-- Explain the suitability scores -->
+            <div class="privacy-callout">
+
+                <span>ⓘ</span>
+
+                <p>
+
+                    <b>How to interpret these results:</b>
+
+                    CareerCast calculates a hybrid suitability score
+                    using matched skills, stated career interests,
+                    education, and job-title keywords. The score may
+                    also include a ranking bonus from the experimental
+                    machine learning model.
+
+                    These scores are indicators generated by the
+                    current recommendation system. They are not
+                    calibrated probabilities of career success,
+                    employment, or job placement. The recommendations
+                    depend on the information in your profile, the
+                    skills detected in your resume, and the limitations
+                    of the available training data.
+
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+
+            CareerCast
+            <span>·</span>
+            AI-powered career path intelligence
+
+        </footer>
+
+    </main>
+
+</div>
+
+{% endblock %}

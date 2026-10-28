@@ -1,0 +1,44 @@
+{
+    "experiment": "Fair four-model comparison",
+    "dataset": "jobs.csv",
+    "records": 2452,
+    "training_records": 1961,
+    "test_records": 491,
+    "number_of_classes": 118,
+    "random_state": 42,
+    "results": [
+        {
+            "model": "Baseline TF-IDF + Logistic Regression",
+            "accuracy": 0.5763747454175153,
+            "macro_precision": 0.6190014081963235,
+            "macro_recall": 0.6596179714823784,
+            "macro_f1": 0.6118306789995671,
+            "top3_coverage": 0.8228105906313645
+        },
+        {
+            "model": "Word + Character TF-IDF + Logistic Regression",
+            "accuracy": 0.6211812627291242,
+            "macro_precision": 0.678651880134931,
+            "macro_recall": 0.6900322841000807,
+            "macro_f1": 0.6698040726160316,
+            "top3_coverage": 0.8615071283095723
+        },
+        {
+            "model": "TF-IDF + Linear SVM",
+            "accuracy": 0.6191446028513238,
+            "macro_precision": 0.6509147161689536,
+            "macro_recall": 0.682015065913371,
+            "macro_f1": 0.6512883638782259,
+            "top3_coverage": 0.8085539714867617
+        },
+        {
+            "model": "Skills + Description + Certifications",
+            "accuracy": 0.7209775967413442,
+            "macro_precision": 0.7464487489911219,
+            "macro_recall": 0.7753531073446327,
+            "macro_f1": 0.7443310015825365,
+            "top3_coverage": 0.9144602851323829
+        }
+    ],
+    "note": "All models use the same cleaned records and held-out split. Three models use Skills only; the fourth uses Skills, Job Description and Certifications. Results measure job-listing classification and do not establish candidate-resume accuracy. Linear SVM scores are decision scores, not probabilities, so its Top-3 ranking is not directly calibrated against the probability-based models."
+}

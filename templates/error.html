@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Error | CareerCast{% endblock %}
+{% block body %}
+<div class="error-page"><a class="brand" href="{{ url_for('dashboard') }}">Career<span>Cast</span></a><div class="error-code">{{ code }}</div><h1>We hit a small detour.</h1><p>{{ message }}</p><a class="btn btn-primary" href="{{ url_for('dashboard') }}">Return to dashboard →</a></div>
+{% endblock %}

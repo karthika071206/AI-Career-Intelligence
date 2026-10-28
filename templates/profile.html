@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}My profile | CareerCast{% endblock %}
+{% block body %}
+<div class="app-layout">
+  <aside class="sidebar">
+    <a class="brand side-brand" href="{{ url_for('dashboard') }}">Career<span>Cast</span></a>
+    <div class="side-caption">CAREER INTELLIGENCE</div>
+    <nav class="side-nav">
+      <a class="nav-link" href="{{ url_for('dashboard') }}"><span>⌂</span> Overview</a>
+      <a class="nav-link active" href="{{ url_for('profile') }}"><span>◉</span> My profile</a>
+      <a class="nav-link" href="{{ url_for('resume_analyzer') }}"><span>▤</span> Resume analyzer</a>
+    </nav>
+    <div class="sidebar-bottom"><form action="{{ url_for('logout') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="nav-link logout-link" type="submit"><span>↪</span> Sign out</button></form></div>
+  </aside>
+  <main class="workspace">
+    <header class="workspace-header"><div><div class="eyebrow">YOUR INFORMATION</div><h1>Professional profile</h1><p>Help CareerCast understand your background and goals.</p></div><a class="btn btn-outline" href="{{ url_for('dashboard') }}">← Dashboard</a></header>
+    <section class="content-panel">
+      <div class="panel-heading"><div class="panel-icon">◉</div><div><h2>About you</h2><p>Fields marked with * are required.</p></div></div>
+      <form method="POST" action="{{ url_for('profile') }}" class="profile-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field"><label for="full_name">Full name *</label><input id="full_name" name="full_name" value="{{ user['full_name'] if user else '' }}" maxlength="100" required></div>
+        <div class="field"><label for="email">Email address</label><input id="email" value="{{ user['email'] if user else '' }}" readonly></div>
+        <div class="field"><label for="education">Education *</label><input id="education" name="education" value="{{ profile['education'] if profile else '' }}" placeholder="e.g. B.Tech" required></div>
+        <div class="field"><label for="branch">Branch / specialization *</label><input id="branch" name="branch" value="{{ profile['branch'] if profile else '' }}" placeholder="e.g. CSE (AI & ML)" required></div>
+        <div class="field field-wide"><label for="college">College / institution *</label><input id="college" name="college" value="{{ profile['college'] if profile else '' }}" placeholder="Your college name" required></div>
+        <div class="field"><label for="graduation_year">Graduation year *</label><input id="graduation_year" name="graduation_year" type="number" min="2000" max="2100" value="{{ profile['graduation_year'] if profile and profile['graduation_year'] else '' }}" placeholder="2028" required></div>
+        <div class="field"><label for="career_interest">Career interests *</label><input id="career_interest" name="career_interest" value="{{ profile['career_interest'] if profile else '' }}" placeholder="e.g. AI/ML, Software, Data" required></div>
+        <div class="field field-wide"><label for="technical_skills">Technical skills *</label><textarea id="technical_skills" name="technical_skills" rows="3" placeholder="Python, Java, SQL, Machine Learning" required>{{ profile['technical_skills'] if profile else '' }}</textarea><small>Separate skills with commas.</small></div>
+        <div class="field field-wide"><label for="soft_skills">Soft skills *</label><textarea id="soft_skills" name="soft_skills" rows="2" placeholder="Communication, teamwork, problem solving" required>{{ profile['soft_skills'] if profile else '' }}</textarea></div>
+        <div class="form-actions"><a class="btn btn-outline" href="{{ url_for('dashboard') }}">Cancel</a><button class="btn btn-primary" type="submit">Save profile <span>→</span></button></div>
+      </form>
+    </section>
+  </main>
+</div>
+{% endblock %}

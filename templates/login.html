@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Sign in | CareerCast{% endblock %}
+{% block body %}
+<div class="auth-shell">
+  <section class="auth-story">
+    <a class="brand" href="{{ url_for('index') }}">Career<span>Cast</span></a>
+    <div class="eyebrow">AI-POWERED CAREER INTELLIGENCE</div>
+    <h1>Your next chapter<br><span>starts here.</span></h1>
+    <p>Turn your skills and experience into a clearer career direction. Explore opportunities, identify skill gaps, and make your next move with confidence.</p>
+    <div class="story-points">
+      <div><span class="point-icon">✦</span><span><b>Resume intelligence</b><small>Extract skills from your PDF resume</small></span></div>
+      <div><span class="point-icon">↗</span><span><b>Career direction</b><small>Build a profile around your goals</small></span></div>
+      <div><span class="point-icon">◎</span><span><b>Skill growth</b><small>Understand what to learn next</small></span></div>
+    </div>
+    <div class="story-footer">A smarter way to plan your professional future.</div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-form-wrap">
+      <div class="mobile-brand"><a class="brand" href="{{ url_for('index') }}">Career<span>Cast</span></a></div>
+      <div class="form-kicker">WELCOME BACK</div>
+      <h2>Sign in to your account</h2>
+      <p class="form-subtitle">Pick up where your career journey left off.</p>
+      <form method="POST" action="{{ url_for('login') }}" class="form-stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+        <button class="btn btn-primary btn-full" type="submit">Sign in <span>→</span></button>
+      </form>
+      <p class="auth-switch">New to CareerCast? <a href="{{ url_for('register') }}">Create an account</a></p>
+      <p class="privacy-note">Your account details are stored locally in this prototype.</p>
+    </div>
+  </section>
+</div>
+{% endblock %}

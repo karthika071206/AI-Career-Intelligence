@@ -1,0 +1,26 @@
+{
+    "model_type": "Word + Character TF-IDF + Logistic Regression",
+    "training_input": "Skills",
+    "dataset": "jobs.csv",
+    "records": 2268,
+    "categories": 118,
+    "note": "This is a skills-based experimental model. The dataset does not provide labeled resume text, so resume-text performance has not been evaluated.",
+    "test_results": [
+        {
+            "model": "Skills only",
+            "accuracy": 0.6123348017621145,
+            "macro_precision": 0.6361612330638878,
+            "macro_recall": 0.6818724539963477,
+            "macro_f1": 0.6372525110593276,
+            "top3_coverage": 0.8392070484581498
+        },
+        {
+            "model": "Skills with extra weight",
+            "accuracy": 0.6145374449339207,
+            "macro_precision": 0.643663956495815,
+            "macro_recall": 0.6883867116168,
+            "macro_f1": 0.6443701349808366,
+            "top3_coverage": 0.8458149779735683
+        }
+    ]
+}

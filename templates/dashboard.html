@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | CareerCast{% endblock %}
+{% block body %}
+<div class="app-layout">
+  <aside class="sidebar">
+    <a class="brand side-brand" href="{{ url_for('dashboard') }}">Career<span>Cast</span></a>
+    <div class="side-caption">CAREER INTELLIGENCE</div>
+    <nav class="side-nav">
+      <a class="nav-link active" href="{{ url_for('dashboard') }}"><span>⌂</span> Overview</a>
+      <a class="nav-link" href="{{ url_for('profile') }}"><span>◉</span> My profile</a>
+      <a class="nav-link" href="{{ url_for('resume_analyzer') }}"><span>▤</span> Resume analyzer</a>
+      <a class="nav-link" href="{{ url_for('career_recommendations') }}"><span>↗</span> Career recommendations</a>
+      <a class="nav-link" href="{{ url_for('skill_gap') }}"><span>⌁</span> Skill gap analysis</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="mini-user"><div class="avatar">{{ (full_name or 'U')[0]|upper }}</div><div><b>{{ full_name }}</b><small>CareerCast member</small></div></div>
+      <form action="{{ url_for('logout') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="nav-link logout-link" type="submit"><span>↪</span> Sign out</button></form>
+    </div>
+  </aside>
+  <main class="workspace">
+    <header class="workspace-header">
+      <div><div class="eyebrow">YOUR WORKSPACE</div><h1>Welcome back, {{ full_name }} <span class="wave">✦</span></h1><p>Make your next career move with clarity and confidence.</p></div>
+      <a class="btn btn-outline" href="{{ url_for('profile') }}">Edit profile <span>↗</span></a>
+    </header>
+    <section class="hero-banner">
+      <div class="hero-copy"><div class="eyebrow light">YOUR CAREER JOURNEY</div><h2>Your potential deserves<br>a plan.</h2><p>Start with your resume and profile. CareerCast helps you organize your skills and prepare for future opportunities.</p><a class="btn btn-white" href="{{ url_for('resume_analyzer') }}">Analyze my resume <span>→</span></a></div>
+      <div class="hero-art"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="art-core">CC</div><div class="float-chip chip-one">Skills ✦</div><div class="float-chip chip-two">Career ↗</div><div class="float-chip chip-three">Growth ↑</div></div>
+    </section>
+    <section class="metric-grid">
+      <article class="metric-card"><div class="metric-top"><span class="metric-icon lavender">⌘</span><span class="metric-label">PROFILE</span></div><strong>{{ completion }}%</strong><p>Profile completion</p><div class="progress"><span style="width: {{ completion }}%"></span></div><a href="{{ url_for('profile') }}">Complete your profile →</a></article>
+      <article class="metric-card"><div class="metric-top"><span class="metric-icon mint">✧</span><span class="metric-label">SKILLS</span></div><strong>{{ skills_count }}</strong><p>Technical skills listed</p><div class="metric-foot">From your saved profile</div><a href="{{ url_for('profile') }}">Manage skills →</a></article>
+      <article class="metric-card"><div class="metric-top"><span class="metric-icon peach">▤</span><span class="metric-label">RESUME</span></div><strong>PDF</strong><p>Resume text extraction</p><div class="metric-foot">Upload a text-based PDF</div><a href="{{ url_for('resume_analyzer') }}">Analyze resume →</a></article>
+    </section>
+    <section id="career-tools" class="section-block">
+      <div class="section-title"><div><div class="eyebrow">TAKE THE NEXT STEP</div><h2>Your career tools</h2></div><span class="section-note">Choose a place to start</span></div>
+      <div class="tool-grid">
+        <article class="tool-card"><div class="tool-icon lavender">◉</div><div class="tool-tag">FOUNDATION</div><h3>Professional profile</h3><p>Keep your education, interests, technical skills, and soft skills organized.</p><a href="{{ url_for('profile') }}" class="tool-link">Update profile <span>→</span></a></article>
+        <article class="tool-card featured-tool"><div class="tool-icon violet">▤</div><div class="tool-tag">START HERE</div><h3>Resume analyzer</h3><p>Upload a PDF, extract readable text, and identify recognized skills from your resume.</p><a href="{{ url_for('resume_analyzer') }}" class="tool-link">Upload resume <span>→</span></a></article>
+        <article class="tool-card"><div class="tool-icon mint">↗</div><div class="tool-tag">CAREER MATCHING</div><h3>Career recommendations</h3><p>Rank career paths using your saved skills, resume skills, and interests.</p><a href="{{ url_for('career_recommendations') }}" class="tool-link">Explore career paths <span>→</span></a></article>
+        <article class="tool-card"><div class="tool-icon peach">⌁</div><div class="tool-tag">LEARNING ROADMAP</div><h3>Skill gap analysis</h3><p>See matched skills, missing competencies, and suggested next learning steps.</p><a href="{{ url_for('skill_gap') }}" class="tool-link">View skill gaps <span>→</span></a></article>
+      </div>
+    </section>
+    <section class="section-block">
+      <div class="section-title"><div><div class="eyebrow">BASED ON YOUR CURRENT PROFILE</div><h2>Career paths to explore</h2></div><a class="tool-link" href="{{ url_for('career_recommendations') }}">View all →</a></div>
+      <div class="tool-grid">
+      {% for rec in recommendations %}<article class="tool-card"><div class="tool-tag">SUITABILITY INDICATOR</div><h3>{{ rec.career }}</h3><div class="progress"><span style="width: {{ rec.score }}%"></span></div><p>{{ rec.score }}% heuristic skill match · {{ rec.matched|length }} skills matched</p><a class="tool-link" href="{{ url_for('skill_gap', career=rec.career) }}">View skill gap <span>→</span></a></article>{% endfor %}
+      </div><p class="muted small-note">Scores are transparent prototype matching indicators, not validated probabilities or employment guarantees.</p>
+    </section>
+    <footer class="footer">CareerCast <span>·</span> AI-powered career path intelligence <span class="footer-right">Built for your next step</span></footer>
+  </main>
+</div>
+{% endblock %}
